@@ -63,6 +63,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.media",
             ],
         },
     },
@@ -115,7 +116,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 # Celery - prefix with CELERY_
-CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_BROKER_URL = "redis://:secret@localhost:6379"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
@@ -130,3 +131,5 @@ EMAIL_HOST_PASSWORD = ""  # add your own settings here
 EMAIL_USE_TLS = True  # add your own settings here
 DEFAULT_FROM_EMAIL = "you@example.com"  # your email address
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

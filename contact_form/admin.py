@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import ContactForm
+from .models import CertificateDetails
 
 
-class ContactFormAdmin(admin.ModelAdmin):
-    list_display = ("email", "name", "subject", "created_on")
+class CertificateDetailsAdmin(admin.ModelAdmin):
+    list_display = ("email", "name", "course", "file_url", "created_on")
 
 
-admin.site.register(ContactForm, ContactFormAdmin)
+admin.site.register(CertificateDetails, CertificateDetailsAdmin)
