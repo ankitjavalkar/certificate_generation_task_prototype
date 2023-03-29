@@ -22,3 +22,11 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     print("Request: {0!r}".format(self.request))
+
+app.conf.beat_schedule = {
+    'retry_doc_generation': {
+        'task': 'schedule_retry',  
+        # Schedule in seconds      
+        'schedule': 10.0,
+    },
+}  
