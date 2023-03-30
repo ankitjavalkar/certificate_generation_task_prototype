@@ -37,12 +37,8 @@ class ParticipantDetails(models.Model):
 
 @signals.before_task_publish.connect
 def handle_before_task_publish(sender=None, body=None, headers=None, **kwargs):
-    print(f"HELLOOO++++++++++++++++++++++++BEFORE---TASK---PUB======{body}=====HH=={headers.get('id')}")
+    print(f"Task ID: {headers.get('id')} before publishing")
     if headers and headers.get('id') and "generate_document" in headers.get("task"):
-        # queryset = TaskLog.objects.filter(task_id=body['id'])
-        # queryset.update(state=TaskLog.PENDING)
-
-        # Actually created here
         queryset = TaskLog.objects.filter(task_id=headers.get('id'))
         if not queryset:
             participant_id = body[0][0]
@@ -54,7 +50,7 @@ def handle_before_task_publish(sender=None, body=None, headers=None, **kwargs):
 
 @signals.after_task_publish.connect
 def handle_after_task_publish(sender=None, body=None, headers=None, **kwargs):
-    print(f"HELLOOO++++++++++++++++++++++++AFTER---TASK---PUB")
+    print(f"Task ID: {headers.get('id')} after publishing")
     if headers and headers.get('id'):
         queryset = TaskLog.objects.filter(task_id=headers.get('id'))
         queryset.update(state=TaskLog.PENDING)
@@ -62,26 +58,20 @@ def handle_after_task_publish(sender=None, body=None, headers=None, **kwargs):
 @signals.task_prerun.connect
 def handle_task_prerun(sender=None, task_id=None, **kwargs):
     if task_id:
-        print(f"HELLOOO+++++++++++++++++++PRERUN+++++STARTED===={task_id}")
+        print(f"Task ID: {task_id} at prerun stage")
         queryset = TaskLog.objects.filter(task_id=task_id)
         queryset.update(state=TaskLog.STARTED)
-        # TaskLog.objects.create(state=TaskLog.STARTED, task_id=task_id)
 
 @signals.task_postrun.connect
 def handle_task_postrun(sender=None, task_id=None, state=None, **kwargs):
     if task_id and state:
-        print(f"HELLOOO++++++++++++++++++++++++MOSTLY-SUCCESSS===={task_id}======={state}")
+        print(f"Task ID: {task_id} currently at postrun stage | Final State: {state}")
         queryset = TaskLog.objects.filter(task_id=task_id)
         queryset.update(state=getattr(TaskLog, state))
-        # TaskLog.objects.create(state=getattr(TaskLog, state), task_id=task_id)
 
 @signals.task_failure.connect
 def handle_task_failure(sender=None, task_id=None, **kwargs):
     if task_id:
+        print(f"Task ID: {task_id} currently at Failure stage")
         queryset = TaskLog.objects.filter(task_id=task_id)
         queryset.update(state=TaskLog.FAILURE)
-        # TaskLog.objects.create(state=TaskLog.FAILURE, task_id=task_id)
-
-# @signals.task_received.connect
-# def handle_task_receive(request=None, **kwargs):
-#     print("HELLOOO++++++++++++++++++++++++RECEIVEEEEEE")

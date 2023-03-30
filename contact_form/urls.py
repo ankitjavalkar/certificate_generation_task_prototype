@@ -11,6 +11,7 @@ urlpatterns = [
     path("generate/", generate_view, name="generate_view"),
     path("task_status/<uuid:task_id>", task_status, name="task_status"),
     path("certificate_status/<uuid:participant_id>", participant_certificate_status, name="participant_certificate_status"),
-    path("docs/", view_documents, name="view_documents"),
+    path("participant_task_status/<uuid:participant_id>", participant_task_status, name="participant_task_status"),
+    # path("docs/", view_documents, name="view_documents"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

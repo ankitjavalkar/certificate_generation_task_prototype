@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from celery.result import AsyncResult
 
 from .tasks import generate_document
-from .models import CertificateDetails, ParticipantDetails
+from .models import CertificateDetails, ParticipantDetails, TaskLog
 from celery_project.settings import MEDIA_ROOT
 
 
@@ -16,10 +16,7 @@ def generate_view(request):
     if request.method == "POST":
         participant_id = request.POST.get("participant_id", "")
         participant = ParticipantDetails.objects.get(participant_id=participant_id)
-        # email = request.POST.get("email", "")
-        # name = request.POST.get("name", "")
-        # course = request.POST.get("course", "")
-        
+
         email = participant.email
         name = participant.name
         course = participant.course
@@ -31,13 +28,6 @@ def generate_view(request):
             email, name, course,
             filepath,
         )
-        # tskid = str(uuid.uuid4()
-        # print(f"START===========TASKID===={tskid}")
-        # task_inst = generate_document.apply_async(
-        #     (participant.pk, email, name, course, filename),
-        #     task_id=tskid)
-        # )
-
         print("INFO: generate_view method execution complete")
         
         return JsonResponse(
@@ -75,6 +65,27 @@ def participant_certificate_status(request, participant_id):
            {
             "status": "FAILURE",
             "message": "certificate could not be generated",
+            }
+        )
+
+@csrf_exempt
+def participant_task_status(request, participant_id):
+    task_log = TaskLog.objects.filter(participant__participant_id=participant_id).latest()
+    if task_log:
+        return JsonResponse(
+            {
+                "participant_id": participant_id,
+                "state": task.state,
+                "task_id": task.task_id
+                "message": "certificate successfully generated",
+                "status": "SUCCESS",
+            }
+        )
+    else:
+        return JsonResponse(
+           {
+            "status": "FAILURE",
+            "message": "Task Log not found",
             }
         )
 
